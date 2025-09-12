@@ -56,12 +56,10 @@ class TaskController extends AbstractController
         $em->persist($task);
         $em->flush();
 
-        $json = $serializer->serialize($task, 'json', ['groups' => 'task']);
-        return new JsonResponse([
-            'data' => json_decode($json, true),
-            'message' => 'Task created successfully',
-        ], Response::HTTP_CREATED);
-    }
+         $json = $serializer->serialize($task, 'json', ['groups' => 'task']);
+
+    return new JsonResponse(json_decode($json, true), Response::HTTP_CREATED);
+}
 
     // Mise à jour tâche
     #[Route('/api/tasks/{id}', name: 'api_tasks_update', methods: ['PUT'])]
@@ -93,12 +91,10 @@ class TaskController extends AbstractController
 
         $em->flush();
 
-        $json = $serializer->serialize($task, 'json', ['groups' => 'task']);
-        return new JsonResponse([
-            'data' => json_decode($json, true),
-            'message' => 'Task updated successfully',
-        ], Response::HTTP_OK);
-    }
+       $json = $serializer->serialize($task, 'json', ['groups' => 'task']);
+
+    return new JsonResponse(json_decode($json, true), Response::HTTP_OK);
+}
 
     // Supprimer une tâche
     #[Route('/api/tasks/{id}', name: 'api_tasks_delete', methods: ['DELETE'])]

@@ -2,6 +2,10 @@
   <div>
     <h2>Liste des tâches</h2>
     <TaskForm @task-added="addTaskToList" />
+
+     <!-- Affichage statut -->
+    <TaskStats :tasks="tasks" />
+
     <ul>
       <TaskItem 
         v-for="task in tasks" 
@@ -17,10 +21,11 @@
 <script>
 import TaskItem from "./TaskItem.vue";
 import TaskForm from "./TaskForm.vue";
+import TaskStats from "./TaskStats.vue";
 import taskService from "../services/taskService";
 
 export default {
-  components: { TaskItem, TaskForm },
+  components: { TaskItem, TaskForm, TaskStats },
   data() {
     return { tasks: [] };
   },
