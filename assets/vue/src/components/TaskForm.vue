@@ -10,24 +10,22 @@ import taskService from "../services/taskService";
 
 export default {
   data() {
-    return { 
-      taskTitle: "" 
-    };
+    return { taskTitle: "" };
   },
   methods: {
     async addTask() {
       if (!this.taskTitle.trim()) return;
 
       const newTask = {
-        title: this.taskTitle,         
-        description: "",               
+        title: this.taskTitle,
+        description: "",
         isCompleted: false
       };
 
       try {
-        await taskService.createTask(newTask);
-        this.taskTitle = ""; // Réinitialise champ texte
-        this.$emit("task-added");
+        const response = await taskService.createTask(newTask);
+        this.taskTitle = "";
+        this.$emit("task-added", response.data);
       } catch (error) {
         console.error("Erreur lors de l'ajout de la tâche:", error);
       }

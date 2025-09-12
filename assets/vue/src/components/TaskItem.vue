@@ -24,9 +24,7 @@
 import taskService from "../services/taskService";
 
 export default {
-  props: {
-    task: Object
-  },
+  props: { task: Object },
   data() {
     return {
       isEditing: false,
@@ -49,11 +47,10 @@ export default {
         description: this.editDescription,
         isCompleted: this.editIsCompleted
       };
-      
       try {
-        await taskService.updateTask(this.task.id, updatedTask);
+        const response = await taskService.updateTask(this.task.id, updatedTask);
         this.isEditing = false;
-        this.$emit("task-updated"); // rafraichit liste
+        this.$emit("task-updated", response.data);
       } catch (error) {
         console.error("Erreur lors de la mise à jour de la tâche:", error);
       }
@@ -61,7 +58,7 @@ export default {
     async deleteTask() {
       try {
         await taskService.deleteTask(this.task.id);
-        this.$emit("task-deleted"); // rafraichit liste
+        this.$emit("task-deleted", this.task.id);
       } catch (error) {
         console.error("Erreur lors de la suppression de la tâche:", error);
       }

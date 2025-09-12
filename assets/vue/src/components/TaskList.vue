@@ -1,14 +1,14 @@
 <template>
   <div>
     <h2>Liste des tâches</h2>
-    <TaskForm @task-added="fetchTasks" />
+    <TaskForm @task-added="addTaskToList" />
     <ul>
       <TaskItem 
         v-for="task in tasks" 
         :key="task.id" 
         :task="task" 
-        @task-deleted="fetchTasks"
-        @task-updated="fetchTasks" 
+        @task-deleted="removeTaskFromList"
+        @task-updated="updateTaskInList" 
       />
     </ul>
   </div>
@@ -25,11 +25,21 @@ export default {
     return { tasks: [] };
   },
   async created() {
-    await this.fetchTasks();
+    const response = await taskService.getTasks();
+    this.tasks = response.data;
   },
   methods: {
-    async fetchTasks() {
-      this.tasks = (await taskService.getTasks()).data;
+    addTaskToList(task) {
+      this.tasks.push(task);
+    },
+    removeTaskFromList(taskId) {
+      this.tasks = this.tasks.filter(t => t.id !== taskId);
+    },
+    updateTaskInList(updatedTask) {
+      const index = this.tasks.findIndex(t => t.id === updatedTask.id);
+      if (index !== -1) {
+        this.tasks.splice(index, 1, updatedTask);
+      }
     }
   }
 };
