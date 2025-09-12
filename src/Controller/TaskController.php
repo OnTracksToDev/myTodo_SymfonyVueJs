@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TaskController extends AbstractController
 {
@@ -33,29 +34,38 @@ class TaskController extends AbstractController
 
     // Crée nouvelle tâche
     #[Route('/api/tasks', name: 'api_tasks_create', methods: ['POST'])]
-    public function createTask(Request $request, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
+    public function createTask(Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['title']) || empty(trim($data['title']))) {
-            return $this->json(['error' => 'Title is required'], Response::HTTP_BAD_REQUEST);
-        }
-
         $task = new Task();
-        $task->setTitle($data['title']);
+        $task->setTitle($data['title'] ?? null);
         $task->setDescription($data['description'] ?? '');
         $task->setIsCompleted(false);
+
+        // Validation Symfony Validator
+        $errors = $validator->validate($task);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getPropertyPath() . ': ' . $error->getMessage();
+            }
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         $em->persist($task);
         $em->flush();
 
         $json = $serializer->serialize($task, 'json', ['groups' => 'task']);
-        return new JsonResponse($json, Response::HTTP_CREATED, [], true);
+        return new JsonResponse([
+            'data' => json_decode($json, true),
+            'message' => 'Task created successfully',
+        ], Response::HTTP_CREATED);
     }
 
     // Mise à jour tâche
     #[Route('/api/tasks/{id}', name: 'api_tasks_update', methods: ['PUT'])]
-    public function updateTask(Task $task, Request $request, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
+    public function updateTask(Task $task, Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -71,10 +81,23 @@ class TaskController extends AbstractController
             $task->setIsCompleted((bool) $data['isCompleted']);
         }
 
+        //  Validation Validator
+        $errors = $validator->validate($task);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getPropertyPath() . ': ' . $error->getMessage();
+            }
+            return $this->json(['errors' => $errorMessages], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
         $em->flush();
 
         $json = $serializer->serialize($task, 'json', ['groups' => 'task']);
-        return new JsonResponse($json, Response::HTTP_OK, [], true);
+        return new JsonResponse([
+            'data' => json_decode($json, true),
+            'message' => 'Task updated successfully',
+        ], Response::HTTP_OK);
     }
 
     // Supprimer une tâche
