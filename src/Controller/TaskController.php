@@ -7,7 +7,7 @@ use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,17 +16,37 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class TaskController extends AbstractController
 {
     // Affichage app
-    #[Route('/index', name: 'app_index', methods: ['GET'])]
+    #[Route('/', name: 'app_index', methods: ['GET'])]
     public function todo(): Response
     {
         return $this->render('vue_app/index.html.twig');
     }
 
-    // Récupére toutes les tâches
+    // Récupére toutes les tâches avec filtre et tri
     #[Route('/api/tasks', name: 'api_tasks_list', methods: ['GET'])]
-    public function listTasks(TaskRepository $taskRepository, SerializerInterface $serializer): JsonResponse
+    public function listTasks(Request $request, TaskRepository $taskRepository, SerializerInterface $serializer): JsonResponse
     {
-        $tasks = $taskRepository->findAll();
+        $filter = $request->query->get('filter', 'all'); 
+        $sort   = $request->query->get('sort', 'date_asc'); 
+        $qb = $taskRepository->createQueryBuilder('t');
+
+        // Filtrage
+        if ($filter === 'active') {
+            $qb->andWhere('t.isCompleted = false');
+        } elseif ($filter === 'done') {
+            $qb->andWhere('t.isCompleted = true');
+        }
+
+        // Tri
+        if ($sort === 'date_asc') {
+            $qb->orderBy('t.createdAt', 'ASC');
+        } elseif ($sort === 'date_desc') {
+            $qb->orderBy('t.createdAt', 'DESC');
+        } elseif ($sort === 'status') {
+            $qb->orderBy('t.isCompleted', 'ASC');
+        }
+
+        $tasks = $qb->getQuery()->getResult();
         $json = $serializer->serialize($tasks, 'json', ['groups' => 'task']);
 
         return new JsonResponse($json, Response::HTTP_OK, [], true);
@@ -42,8 +62,10 @@ class TaskController extends AbstractController
         $task->setTitle($data['title'] ?? null);
         $task->setDescription($data['description'] ?? '');
         $task->setIsCompleted(false);
+        $task->setCreatedAt(new \DateTime());
+        $task->setUpdatedAt(new \DateTime());
 
-        // Validation Symfony Validator
+        // Validation Validator
         $errors = $validator->validate($task);
         if (count($errors) > 0) {
             $errorMessages = [];
@@ -56,10 +78,9 @@ class TaskController extends AbstractController
         $em->persist($task);
         $em->flush();
 
-         $json = $serializer->serialize($task, 'json', ['groups' => 'task']);
-
-    return new JsonResponse(json_decode($json, true), Response::HTTP_CREATED);
-}
+        $json = $serializer->serialize($task, 'json', ['groups' => 'task']);
+        return new JsonResponse(json_decode($json, true), Response::HTTP_CREATED);
+    }
 
     // Mise à jour tâche
     #[Route('/api/tasks/{id}', name: 'api_tasks_update', methods: ['PUT'])]
@@ -76,10 +97,12 @@ class TaskController extends AbstractController
         }
 
         if (isset($data['isCompleted'])) {
-            $task->setIsCompleted((bool) $data['isCompleted']);
+            $task->setIsCompleted((bool)$data['isCompleted']);
         }
 
-        //  Validation Validator
+        $task->setUpdatedAt(new \DateTime());
+
+        // Validation Validator
         $errors = $validator->validate($task);
         if (count($errors) > 0) {
             $errorMessages = [];
@@ -91,10 +114,9 @@ class TaskController extends AbstractController
 
         $em->flush();
 
-       $json = $serializer->serialize($task, 'json', ['groups' => 'task']);
-
-    return new JsonResponse(json_decode($json, true), Response::HTTP_OK);
-}
+        $json = $serializer->serialize($task, 'json', ['groups' => 'task']);
+        return new JsonResponse(json_decode($json, true), Response::HTTP_OK);
+    }
 
     // Supprimer une tâche
     #[Route('/api/tasks/{id}', name: 'api_tasks_delete', methods: ['DELETE'])]

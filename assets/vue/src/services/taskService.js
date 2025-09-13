@@ -3,8 +3,8 @@ import axios from 'axios';
 const API_URL = 'http://127.0.0.1:8000/api/tasks';
 
 export default {
-  getTasks() {
-    return axios.get(API_URL);
+  getTasks(params = {}) {
+    return axios.get(API_URL, { params });
   },
   createTask(task) {
     return axios.post(API_URL, task);

@@ -31,6 +31,21 @@ class Task
     #[Groups('task')]
     private bool $isCompleted = false;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups('task')]
+    private ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups('task')]
+    private ?\DateTimeInterface $updatedAt = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+    }
+
+    // Getters & Setters
     public function getId(): ?int
     {
         return $this->id;
@@ -44,7 +59,6 @@ class Task
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -56,11 +70,10 @@ class Task
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
-    public function isCompleted(): ?bool
+    public function getIsCompleted(): bool
     {
         return $this->isCompleted;
     }
@@ -68,7 +81,28 @@ class Task
     public function setIsCompleted(bool $isCompleted): static
     {
         $this->isCompleted = $isCompleted;
+        return $this;
+    }
 
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 }
