@@ -2,8 +2,28 @@
   <li :class="{ completed: task.isCompleted }">
     <!-- Case -->
     <input type="checkbox" :checked="task.isCompleted" @change="toggleCompletion" />
-    <span>{{ task.title }}</span> - 
-    <span>{{ task.description || 'Pas de description' }}</span>
+<!-- Titre -->
+    <span v-if="!isEditingTitle" @dblclick="startEditing('title')">{{ task.title }}</span>
+    <input 
+      v-else 
+      v-model="editTitle" 
+      @blur="saveTask" 
+      @keyup.enter="saveTask" 
+      autofocus
+    />
+
+    - 
+
+    <!-- Description -->
+    <span v-if="!isEditingDescription" @dblclick="startEditing('description')">
+      {{ task.description || 'Pas de description' }}
+    </span>
+    <textarea 
+      v-else 
+      v-model="editDescription" 
+      @blur="saveTask" 
+      @keyup.enter="saveTask"
+    />
     <button @click="editTask">Modifier</button>
     <button @click="deleteTask">Supprimer</button>
 
@@ -24,12 +44,15 @@ export default {
   props: { task: Object },
   data() {
     return {
-      isEditing: false,
+      isEditingTitle: false,
+      isEditingDescription: false,
       editTitle: this.task.title,
-      editDescription: this.task.description || ""
+      editDescription: this.task.description || "",
+      isEditing: false
     };
   },
   methods: {
+    // Edition classique
     editTask() {
       this.isEditing = true;
     },
@@ -37,7 +60,17 @@ export default {
       this.isEditing = false;
       this.editTitle = this.task.title;
       this.editDescription = this.task.description || "";
+      this.isEditingTitle = false;
+      this.isEditingDescription = false;
     },
+
+    // Début édition rapide
+    startEditing(field) {
+      if (field === "title") this.isEditingTitle = true;
+      if (field === "description") this.isEditingDescription = true;
+    },
+
+    // Sauvegarde (auto-save)
     async saveTask() {
       const updatedTask = {
         title: this.editTitle,
@@ -47,6 +80,8 @@ export default {
       try {
         const response = await taskService.updateTask(this.task.id, updatedTask);
         this.isEditing = false;
+        this.isEditingTitle = false;
+        this.isEditingDescription = false;
         this.$emit("task-updated", response.data);
       } catch (error) {
         console.error("Erreur lors de la mise à jour de la tâche :", error);
