@@ -1,9 +1,15 @@
-import { createApp } from 'vue';
-import App from './App.vue';
+// CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/app.scss';
 
+// Vue
+import { createApp } from 'vue';
+import App from './App.vue';
 
 console.log("Coucou Vue.js !"); // Test
 
 const app = createApp(App);
 app.mount('#app');
+
+// JS Bootstrap
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';

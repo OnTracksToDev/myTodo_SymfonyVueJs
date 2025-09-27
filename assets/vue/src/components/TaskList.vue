@@ -13,7 +13,7 @@
     />
 
     <!-- Liste des tâches -->
-    <ul>
+    <transition-group name="task" tag="ul" class="list-group">
       <TaskItem 
         v-for="task in tasks" 
         :key="task.id" 
@@ -21,7 +21,7 @@
         @task-deleted="removeTaskFromList"
         @task-updated="updateTaskInList"
       />
-    </ul>
+    </transition-group>
   </div>
 </template>
 
@@ -45,7 +45,6 @@ export default {
     this.fetchTasks();
   },
   methods: {
-    // Récupère tâches API avec filtre et tri
     async fetchTasks() {
       try {
         const response = await taskService.getTasks({ filter: this.filter, sort: this.sort });
@@ -54,30 +53,20 @@ export default {
         console.error("Erreur lors de la récupération des tâches :", error);
       }
     },
-
-    // Changement filtre
     setFilter(value) {
       this.filter = value;
       this.fetchTasks();
     },
-
-    // Changement tri
     setSort(value) {
       this.sort = value;
       this.fetchTasks();
     },
-
-    // Ajout tâche
     addTaskToList(task) {
       this.tasks.push(task);
     },
-
-    // Suppression tâche
     removeTaskFromList(taskId) {
       this.tasks = this.tasks.filter(t => t.id !== taskId);
     },
-
-    // Mise à jour tâche
     updateTaskInList(updatedTask) {
       const index = this.tasks.findIndex(t => t.id === updatedTask.id);
       if (index !== -1) this.tasks.splice(index, 1, updatedTask);
@@ -87,12 +76,36 @@ export default {
 </script>
 
 <style scoped>
-ul {
+/* Liste */
+.list-group {
   padding-left: 0;
-  list-style: none;
+  margin-top: 10px;
 }
+
+/* Titre */
 h2 {
   margin-bottom: 10px;
   color: #2c3e50;
+}
+
+/* Transitions */
+.task-enter-active, .task-leave-active {
+  transition: all 0.4s ease;
+}
+.task-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.task-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+.task-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+.task-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
 }
 </style>

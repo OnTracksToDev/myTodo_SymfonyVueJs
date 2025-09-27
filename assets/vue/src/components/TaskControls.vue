@@ -1,16 +1,16 @@
 <template>
-  <div class="task-controls">
+  <div class="task-controls mb-3">
     <!-- Filtre -->
-    <div class="filter-buttons">
-      <button @click="$emit('filter-changed', 'all')">Toutes</button>
-      <button @click="$emit('filter-changed', 'active')">Actives</button>
-      <button @click="$emit('filter-changed', 'done')">Terminées</button>
+    <div class="btn-group mb-2" role="group" aria-label="Filtre tâches">
+      <button type="button" class="btn btn-outline-primary" @click="$emit('filter-changed', 'all')">Toutes</button>
+      <button type="button" class="btn btn-outline-primary" @click="$emit('filter-changed', 'active')">Actives</button>
+      <button type="button" class="btn btn-outline-primary" @click="$emit('filter-changed', 'done')">Terminées</button>
     </div>
 
     <!-- Tri -->
-    <div class="sort-select">
-      <label>Tri : </label>
-      <select v-model="sortValue" @change="emitSort">
+    <div class="mb-2">
+      <label class="form-label me-2">Tri :</label>
+      <select class="form-select w-auto d-inline-block" v-model="sortValue" @change="emitSort">
         <option value="date_asc">Date ↑</option>
         <option value="date_desc">Date ↓</option>
         <option value="status">Statut</option>
@@ -18,10 +18,17 @@
     </div>
 
     <!-- Barre de progression -->
-    <div v-if="tasks.length" class="progress-bar">
-      <p>{{ doneCount }}/{{ tasks.length }} tâches terminées</p>
-      <div class="bar-background">
-        <div class="bar-foreground" :style="{ width: progress + '%' }"></div>
+    <div v-if="tasks.length" class="mb-2">
+      <p class="mb-1">{{ doneCount }}/{{ tasks.length }} tâches terminées</p>
+      <div class="progress">
+        <div 
+          class="progress-bar" 
+          role="progressbar" 
+          :style="{ width: progress + '%' }" 
+          :aria-valuenow="doneCount" 
+          :aria-valuemin="0" 
+          :aria-valuemax="tasks.length">
+        </div>
       </div>
     </div>
   </div>
@@ -56,17 +63,7 @@ export default {
 </script>
 
 <style scoped>
-.filter-buttons button { margin-right: 5px; }
-.bar-background {
-  background: #eee;
-  width: 200px;
-  height: 10px;
-  border-radius: 5px;
-  margin-top: 5px;
-}
-.bar-foreground {
-  background: #4caf50;
-  height: 10px;
-  border-radius: 5px;
+.task-controls > * {
+  margin-bottom: 1rem;
 }
 </style>
