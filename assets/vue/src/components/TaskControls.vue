@@ -44,7 +44,7 @@ export default {
     }
   },
   data() {
-    return { sortValue: 'date_asc' };
+    return { sortValue: 'date_desc' };
   },
   computed: {
     doneCount() {

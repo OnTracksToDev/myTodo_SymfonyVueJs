@@ -15,7 +15,7 @@
     <!-- Liste des tâches -->
     <transition-group name="task" tag="ul" class="list-group">
       <TaskItem 
-        v-for="task in tasks" 
+        v-for="task in sortedFilteredTasks" 
         :key="task.id" 
         :task="task" 
         @task-deleted="removeTaskFromList"
@@ -38,31 +38,51 @@ export default {
     return { 
       tasks: [],
       filter: 'all',
-      sort: 'date_asc'
+      sort: 'date_desc'
     };
   },
   created() {
     this.fetchTasks();
   },
+  computed: {
+    // Liste filtrée et triée
+    sortedFilteredTasks() {
+      let filtered = [...this.tasks];
+
+      // Filtre
+      if (this.filter === 'active') filtered = filtered.filter(t => !t.isCompleted);
+      if (this.filter === 'done') filtered = filtered.filter(t => t.isCompleted);
+
+      // Tri
+      if (this.sort === 'date_asc') {
+        filtered.sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt));
+      } else if (this.sort === 'date_desc') {
+        filtered.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+      } else if (this.sort === 'status') {
+        filtered.sort((a,b) => a.isCompleted - b.isCompleted);
+      }
+
+      return filtered;
+    }
+  },
   methods: {
     async fetchTasks() {
       try {
-        const response = await taskService.getTasks({ filter: this.filter, sort: this.sort });
-        this.tasks = response.data; 
+        const response = await taskService.getTasks();
+        this.tasks = response.data;
       } catch (error) {
         console.error("Erreur lors de la récupération des tâches :", error);
       }
     },
     setFilter(value) {
       this.filter = value;
-      this.fetchTasks();
     },
     setSort(value) {
       this.sort = value;
-      this.fetchTasks();
     },
     addTaskToList(task) {
-      this.tasks.push(task);
+      // Nouvelle tâche en haut
+      this.tasks.unshift(task);
     },
     removeTaskFromList(taskId) {
       this.tasks = this.tasks.filter(t => t.id !== taskId);
@@ -76,36 +96,12 @@ export default {
 </script>
 
 <style scoped>
-/* Liste */
-.list-group {
-  padding-left: 0;
-  margin-top: 10px;
-}
-
-/* Titre */
-h2 {
-  margin-bottom: 10px;
-  color: #2c3e50;
-}
-
+.list-group { padding-left: 0; margin-top: 10px; }
+h2 { margin-bottom: 10px; color: #2c3e50; }
 /* Transitions */
-.task-enter-active, .task-leave-active {
-  transition: all 0.4s ease;
-}
-.task-enter-from {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-.task-enter-to {
-  opacity: 1;
-  transform: translateY(0);
-}
-.task-leave-from {
-  opacity: 1;
-  transform: translateY(0);
-}
-.task-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
-}
+.task-enter-active, .task-leave-active { transition: all 0.4s ease; }
+.task-enter-from { opacity: 0; transform: translateY(-10px); }
+.task-enter-to { opacity: 1; transform: translateY(0); }
+.task-leave-from { opacity: 1; transform: translateY(0); }
+.task-leave-to { opacity: 0; transform: translateY(10px); }
 </style>
