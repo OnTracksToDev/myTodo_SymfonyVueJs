@@ -26,6 +26,7 @@
             @blur="saveTask"
             @keyup.enter="saveTask"
             class="form-control form-control-sm"
+            v-focus
           />
         </div>
 
@@ -56,6 +57,7 @@
           rows="2"
           class="form-control form-control-sm"
           placeholder="Saisissez une description..."
+          v-focus
         ></textarea>
       </div>
 

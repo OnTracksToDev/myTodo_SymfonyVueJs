@@ -9,6 +9,12 @@ import App from './App.vue';
 console.log("Coucou Vue.js !"); // Test
 
 const app = createApp(App);
+// Directive globale pour autofocus
+app.directive('focus', {
+  mounted(el) {
+    el.focus();
+  }
+});
 app.mount('#app');
 
 // JS Bootstrap
