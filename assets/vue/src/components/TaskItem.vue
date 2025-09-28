@@ -1,17 +1,24 @@
 <template>
-  <li :class="['list-group-item', { completed: task.isCompleted }]">
-    <div v-if="!isDeleting">
-      <div class="d-flex align-items-start justify-content-between">
-        <!-- Case -->
-        <div class="d-flex align-items-center">
-          <input
-            type="checkbox"
-            class="form-check-input me-2"
-            :checked="task.isCompleted"
-            @change="toggleCompletion"
-          />
+  <li
+    :class="['list-group-item', { completed: task.isCompleted }]"
+    class="position-relative d-flex align-items-center"
+  >
+    <!-- Contenu normal -->
+    <div v-if="!isDeleting" class="d-flex flex-grow-1 align-items-center">
+      <!-- Partie gauche : Case -->
+      <div class="d-flex align-items-center me-3">
+        <input
+          type="checkbox"
+          class="custom-checkbox"
+          :checked="task.isCompleted"
+          @change="toggleCompletion"
+        />
+      </div>
 
-          <!-- Titre -->
+      <!-- Partie centrale -->
+      <div class="flex-grow-1 d-flex flex-column">
+        <!-- Titre -->
+        <div class="d-flex align-items-center">
           <span
             v-if="!isEditingTitle"
             @dblclick="startEditing('title')"
@@ -30,47 +37,51 @@
           />
         </div>
 
-        <!-- Bouton supprimer -->
-        <button @click="deleteTask" class="btn btn-outline-danger btn-sm ms-2">
-          Supprimer
+        <!-- Description -->
+        <div class="mt-1">
+          <span
+            v-if="!isEditingDescription"
+            @dblclick="startEditing('description')"
+            :class="[
+              'editable d-inline-flex align-items-center position-relative',
+              { 'text-muted fst-italic': !task.description },
+            ]"
+          >
+            {{ task.description || "Pas de description" }}
+            <i class="bi bi-pencil-fill edit-icon ms-1"></i>
+          </span>
+          <textarea
+            v-else
+            v-model="editDescription"
+            @blur="saveTask"
+            @keyup.enter="saveTask"
+            rows="2"
+            class="form-control form-control-sm"
+            placeholder="Saisissez une description..."
+            v-focus
+          ></textarea>
+        </div>
+
+        <!-- Feedback sauvegarde -->
+        <div v-if="isSaving" class="text-info small mt-2">
+          <span class="spinner-border spinner-border-sm me-1"></span>
+          Sauvegarde...
+        </div>
+        <div v-if="saveSuccess" class="text-success small mt-2">
+          ✔ Sauvegardé !
+        </div>
+      </div>
+
+      <!-- Partie droite : bouton supprimer -->
+      <div class="d-flex align-items-center ms-3">
+        <button
+          @click="deleteTask"
+          class="btn btn-outline-danger btn-sm btn-delete d-flex align-items-center justify-content-center"
+        >
+          <i class="bi bi-trash"></i>
         </button>
       </div>
-
-      <!-- Description -->
-      <div class="mt-2">
-        <span
-          v-if="!isEditingDescription"
-          @dblclick="startEditing('description')"
-          :class="[
-            'editable d-inline-flex align-items-center position-relative',
-            { 'text-muted fst-italic': !task.description },
-          ]"
-        >
-          {{ task.description || "Pas de description" }}
-          <i class="bi bi-pencil-fill edit-icon ms-1"></i>
-        </span>
-        <textarea
-          v-else
-          v-model="editDescription"
-          @blur="saveTask"
-          @keyup.enter="saveTask"
-          rows="2"
-          class="form-control form-control-sm"
-          placeholder="Saisissez une description..."
-          v-focus
-        ></textarea>
-      </div>
-
-      <!-- Feedback sauvegarde -->
-      <div v-if="isSaving" class="text-info small mt-2">
-        <span class="spinner-border spinner-border-sm me-1"></span>
-        Sauvegarde...
-      </div>
-      <div v-if="saveSuccess" class="text-success small mt-2">
-        ✔ Sauvegardé !
-      </div>
     </div>
-
     <!-- Feedback suppression -->
     <div v-else class="text-danger small">❌ Tâche supprimée...</div>
   </li>
@@ -165,16 +176,60 @@ export default {
 </script>
 
 <style scoped>
+/* Masquer la checkbox classique */
+.custom-checkbox {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #6c757d;
+  border-radius: 50%; /* rond */
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+/* Quand coché */
+.custom-checkbox:checked {
+  background-color: #28a745; /* vert */
+  border-color: #28a745;
+}
+
+/* Checkmark */
+.custom-checkbox:checked::after {
+  content: '✔';
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Hover pour li non complétés */
+li:not(.completed):hover {
+  background-color: #f0f0f0; /* couleur douce au hover */
+  transition: background-color 0.2s;
+}
+
 .completed {
-  color: #888;
-  background-color: #f0f0f0;
+  color: #888888;
+  background-color: #b5cfb3;
+  transition: background-color 0.2s;
+}
+
+.completed:hover {
+  color: #888888;
+  background-color: #b7e3b4;
 }
 
 /* Curseur + hover */
 .editable {
   cursor: text;
   transition: background-color 0.2s;
-  padding-right: 0.5rem;  /* espace pour icône */
+  padding-right: 0.5rem; /* espace pour icône */
 }
 
 .editable:hover {
@@ -192,6 +247,20 @@ export default {
 
 .editable:hover .edit-icon {
   opacity: 1;
+}
+/* Bouton supprimer : masqué par défaut */
+li .btn-delete {
+  opacity: 0;
+  transform: translateX(5px) scale(0.9);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none; /* Empêche le clic quand invisible */
+}
+
+/* Affichage au survol du li */
+li:hover .btn-delete {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
 }
 
 /* Feedback */

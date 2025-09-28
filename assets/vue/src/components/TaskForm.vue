@@ -17,6 +17,7 @@
 import taskService from "../services/taskService";
 
 export default {
+  emits: ['task-added'],
   data() {
     return {
       taskTitle: "",
