@@ -1,13 +1,13 @@
 <template>
-  <div>
+  <div class="container-fluid">
     <TaskList />
   </div>
 </template>
 
 <script>
-import TaskList from './components/TaskList.vue';
+import TaskList from "./components/TaskList.vue";
 
 export default {
-  components: { TaskList }
+  components: { TaskList },
 };
 </script>

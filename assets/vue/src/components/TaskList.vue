@@ -1,35 +1,37 @@
 <template>
-  <div>
-    <h2>Liste des tâches</h2>
+    <div class="row justify-content-center mt-4">
+      <div class="col-12 col-sm-6">
+        <h2>Liste des tâches</h2>
 
-    <!-- Formulaire pour ajouter une tâche -->
-    <TaskForm @task-added="addTaskToList" />
+        <!-- Formulaire pour ajouter une tâche -->
+        <TaskForm @task-added="addTaskToList" />
 
-    <!-- Contrôles : filtre, tri, barre de progression -->
-    <TaskControls
-      :tasks="sortedFilteredTasks"
-      @filter-changed="setFilter"
-      @sort-changed="setSort"
-    />
+        <!-- Contrôles : filtre, tri, barre de progression -->
+        <TaskControls
+          :tasks="sortedFilteredTasks"
+          @filter-changed="setFilter"
+          @sort-changed="setSort"
+        />
 
-    <!-- Liste des tâches -->
-    <transition-group name="task" tag="ul" class="list-group">
-      <TaskItem
-        v-for="task in sortedFilteredTasks"
-        :key="task.id"
-        :task="task"
-        @task-deleted="removeTaskFromList"
-        @task-updated="updateTaskInList"
-      />
-    </transition-group>
-    <!-- Message si aucune tâche -->
-    <div
-      v-if="sortedFilteredTasks.length === 0"
-      class="text-center text-muted mt-3"
-    >
-      <span v-if="filter === 'all'">Aucune tâche disponible.</span>
-      <span v-else-if="filter === 'active'">Aucune tâche active.</span>
-      <span v-else-if="filter === 'done'">Aucune tâche terminée.</span>
+        <!-- Liste des tâches -->
+        <transition-group name="task" tag="ul" class="list-group">
+          <TaskItem
+            v-for="task in sortedFilteredTasks"
+            :key="task.id"
+            :task="task"
+            @task-deleted="removeTaskFromList"
+            @task-updated="updateTaskInList"
+          />
+        </transition-group>
+        <!-- Message si aucune tâche -->
+        <div
+          v-if="sortedFilteredTasks.length === 0"
+          class="text-center text-muted mt-3"
+        >
+          <span v-if="filter === 'all'">Aucune tâche disponible.</span>
+          <span v-else-if="filter === 'active'">Aucune tâche active.</span>
+          <span v-else-if="filter === 'done'">Aucune tâche terminée.</span>
+        </div>
     </div>
   </div>
 </template>

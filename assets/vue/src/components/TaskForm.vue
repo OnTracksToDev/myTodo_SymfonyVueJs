@@ -1,23 +1,30 @@
 <template>
-  <form @submit.prevent="addTask" class="d-flex gap-2 align-items-center">
-    <input
-      v-model="taskTitle"
-      type="text"
-      class="form-control"
-      placeholder="Nouvelle tâche"
-      required
-      @keyup.enter="addTask"
-    />
-    <button type="submit" class="btn btn-primary">Ajouter</button>
+  <form @submit.prevent="addTask" class="row g-2 align-items-center mb-0">
+    <!-- Champ texte -->
+    <div class="col-12 col-md-8">
+      <input
+        v-model="taskTitle"
+        type="text"
+        class="form-control"
+        placeholder="Nouvelle tâche"
+        required
+        @keyup.enter="addTask"
+      />
+    </div>
+
+    <!-- Bouton -->
+    <div class="col-12 col-md-4 d-grid">
+      <button type="submit" class="btn btn-dark">Ajouter</button>
+    </div>
   </form>
+
   <div ref="alertContainer"></div>
 </template>
-
 <script>
 import taskService from "../services/taskService";
 
 export default {
-  emits: ['task-added'],
+  emits: ["task-added"],
   data() {
     return {
       taskTitle: "",
