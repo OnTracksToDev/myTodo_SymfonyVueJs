@@ -61,15 +61,13 @@
             v-focus
           ></textarea>
         </div>
-
+        
         <!-- Feedback sauvegarde -->
-        <div v-if="isSaving" class="text-info small mt-2">
-          <span class="spinner-border spinner-border-sm me-1"></span>
-          Sauvegarde...
-        </div>
-        <div v-if="saveSuccess" class="text-success small mt-2">
-          ✔ Sauvegardé !
-        </div>
+        <transition name="fade">
+          <div v-if="saveSuccess" class="text-success fw-semibold">
+            <i class="bi bi-check-circle-fill"></i> Sauvegardé !
+          </div>
+        </transition>
       </div>
 
       <!-- Partie droite : bouton supprimer -->
@@ -82,6 +80,7 @@
         </button>
       </div>
     </div>
+
     <!-- Feedback suppression -->
     <div v-else class="text-danger small">❌ Tâche supprimée...</div>
   </li>
@@ -98,7 +97,6 @@ export default {
       isEditingDescription: false,
       editTitle: this.task.title,
       editDescription: this.task.description,
-      isSaving: false,
       saveSuccess: false,
       isDeleting: false,
     };
@@ -110,9 +108,6 @@ export default {
     },
 
     async saveTask() {
-      if (this.isSaving) return;
-      this.isSaving = true;
-
       const updatedTask = {
         title: this.editTitle,
         description: this.editDescription.trim() || "",
@@ -136,11 +131,9 @@ export default {
 
           this.saveSuccess = true;
           setTimeout(() => (this.saveSuccess = false), 1500);
-          this.isSaving = false;
         }, Math.max(0, minDuration - elapsed));
       } catch (error) {
         console.error("Erreur update :", error);
-        this.isSaving = false;
       }
     },
 
@@ -199,7 +192,7 @@ export default {
 
 /* Checkmark */
 .custom-checkbox:checked::after {
-  content: '✔';
+  content: "✔";
   color: white;
   font-size: 14px;
   position: absolute;
@@ -264,8 +257,16 @@ li:hover .btn-delete {
 }
 
 /* Feedback */
-.text-info,
 .text-success {
   transition: opacity 0.3s ease;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
