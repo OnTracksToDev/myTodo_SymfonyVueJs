@@ -1,37 +1,59 @@
 <template>
-    <div class="row justify-content-center mt-4">
-      <div class="col-12 col-sm-6">
-        <h2>Liste des tâches</h2>
+  <div class="row justify-content-center mt-4">
+    <div class="col-12 col-sm-6">
+      <h2>Liste des tâches</h2>
 
-        <!-- Formulaire pour ajouter une tâche -->
-        <TaskForm @task-added="addTaskToList" />
+      <!-- Formulaire pour ajouter une tâche -->
+      <TaskForm @task-added="addTaskToList" />
 
-        <!-- Contrôles : filtre, tri, barre de progression -->
-        <TaskControls
-          :tasks="sortedFilteredTasks"
-          @filter-changed="setFilter"
-          @sort-changed="setSort"
-        />
+      <!-- Contrôles : filtre, tri, barre de progression -->
+      <TaskControls
+        :tasks="sortedFilteredTasks"
+        @filter-changed="setFilter"
+        @sort-changed="setSort"
+      />
 
-        <!-- Liste des tâches -->
-        <transition-group name="task" tag="ul" class="list-group">
+      <!-- Liste des tâches -->
+      <transition-group
+        name="task-transition"
+        tag="div"
+        class="list-group task-list-container"
+      >
+        <div
+          v-for="task in sortedFilteredTasks"
+          :key="task.id"
+          class="list-group task-transition-item"
+        >
           <TaskItem
-            v-for="task in sortedFilteredTasks"
-            :key="task.id"
             :task="task"
             @task-deleted="removeTaskFromList"
             @task-updated="updateTaskInList"
           />
-        </transition-group>
-        <!-- Message si aucune tâche -->
-        <div
-          v-if="sortedFilteredTasks.length === 0"
-          class="text-center text-muted mt-3"
-        >
-          <span v-if="filter === 'all'">Aucune tâche disponible.</span>
-          <span v-else-if="filter === 'active'">Aucune tâche active.</span>
-          <span v-else-if="filter === 'done'">Aucune tâche terminée.</span>
         </div>
+      </transition-group>
+
+      <!-- Toast global -->
+      <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div
+          v-if="toastMessage"
+          class="toast align-items-center text-bg-warning border-0 show"
+          role="alert"
+        >
+          <div class="d-flex">
+            <div class="toast-body">{{ toastMessage }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message si aucune tâche -->
+      <div
+        v-if="sortedFilteredTasks.length === 0"
+        class="text-center text-muted mt-3"
+      >
+        <span v-if="filter === 'all'">Aucune tâche disponible.</span>
+        <span v-else-if="filter === 'active'">Aucune tâche active.</span>
+        <span v-else-if="filter === 'done'">Aucune tâche terminée.</span>
+      </div>
     </div>
   </div>
 </template>
@@ -50,6 +72,7 @@ export default {
       tasks: [],
       filter: "all",
       sort: "date_desc",
+      toastMessage: "",
     };
   },
   created() {
@@ -96,46 +119,75 @@ export default {
     addTaskToList(task) {
       // Nouvelle tâche en haut
       this.tasks.unshift(task);
+      this.showToast(`✅ Tâche "${task.title}" ajoutée !`);
     },
     removeTaskFromList(taskId) {
-      this.tasks = this.tasks.filter((t) => t.id !== taskId);
+      const index = this.tasks.findIndex((t) => t.id === taskId);
+      if (index !== -1) {
+        const title = this.tasks[index].title;
+        // Attendre la fin de la transition avant de supprimer
+        setTimeout(() => {
+          this.tasks.splice(index, 1);
+          this.showToast(`🗑️ Tâche "${title}" supprimée`);
+        }, 400);
+      }
     },
     updateTaskInList(updatedTask) {
       const index = this.tasks.findIndex((t) => t.id === updatedTask.id);
       if (index !== -1) this.tasks.splice(index, 1, updatedTask);
+    },
+    showToast(msg) {
+      this.toastMessage = msg;
+      setTimeout(() => (this.toastMessage = ""), 2000);
     },
   },
 };
 </script>
 
 <style scoped>
-.list-group {
+.task-list-container {
   padding-left: 0;
   margin-top: 10px;
 }
-h2 {
-  margin-bottom: 10px;
-  color: #2c3e50;
+
+/* Transitions pour l'entrée et la sortie */
+.task-transition-enter-active {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
-/* Transitions */
-.task-enter-active,
-.task-leave-active {
-  transition: all 0.4s ease;
+
+.task-transition-leave-active {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.task-enter-from {
+
+.task-transition-enter-from {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateX(30px) scale(0.95);
 }
-.task-enter-to {
+
+.task-transition-enter-to {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0) scale(1);
 }
-.task-leave-from {
+
+.task-transition-leave-from {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0) scale(1);
 }
-.task-leave-to {
+
+.task-transition-leave-to {
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateX(-30px) scale(0.95);
+}
+
+/* Transition pour le réarrangement des éléments */
+.task-transition-move {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Style pour chaque item */
+.task-transition-item {
+  padding-left: 0;
+  margin-bottom: 5px;
+  transition: all 0.5s ease;
 }
 </style>

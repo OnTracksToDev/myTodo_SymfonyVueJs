@@ -17,9 +17,8 @@
       <button type="submit" class="btn btn-dark">Ajouter</button>
     </div>
   </form>
-
-  <div ref="alertContainer"></div>
 </template>
+
 <script>
 import taskService from "../services/taskService";
 
@@ -45,27 +44,17 @@ export default {
         const response = await taskService.createTask(newTask);
         this.taskTitle = "";
 
-        // Feedback visuel avec alert Bootstrap
-        const alertDiv = document.createElement("div");
-        alertDiv.className = "alert alert-success mt-2";
-        alertDiv.textContent = `Tâche "${title}" ajoutée !`;
-        this.$refs.alertContainer.appendChild(alertDiv);
-        setTimeout(() => alertDiv.remove(), 2000);
-
         this.$emit("task-added", response.data);
+
       } catch (error) {
         console.error("Erreur lors de l'ajout de la tâche:", error);
-
-        const alertDiv = document.createElement("div");
-        alertDiv.className = "alert alert-danger mt-2";
-        alertDiv.textContent = `Erreur : impossible d'ajouter la tâche.`;
-        this.$refs.alertContainer.appendChild(alertDiv);
-        setTimeout(() => alertDiv.remove(), 3000);
+        this.$emit("show-toast", `❌ Impossible d'ajouter la tâche`);
       }
     },
   },
 };
 </script>
+
 <style scoped>
 form {
   margin-bottom: 1rem;
