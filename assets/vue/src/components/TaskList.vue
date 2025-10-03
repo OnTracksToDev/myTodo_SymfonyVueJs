@@ -1,8 +1,9 @@
 <template>
   <div class="row justify-content-center mt-4">
     <div class="col-12 col-sm-6">
-      <h2>Liste des tâches</h2>
-
+      <h2 class="app-title text-center">
+        <i class="bi bi-list-task me-2"></i> Liste des tâches
+      </h2>
       <!-- Formulaire pour ajouter une tâche -->
       <TaskForm @task-added="addTaskToList" />
 
@@ -17,7 +18,7 @@
       <transition-group
         name="task-transition"
         tag="div"
-        class="list-group task-list-container"
+        class="task-list-container"
       >
         <div
           v-for="task in sortedFilteredTasks"
@@ -48,8 +49,9 @@
       <!-- Message si aucune tâche -->
       <div
         v-if="sortedFilteredTasks.length === 0"
-        class="text-center text-muted mt-3"
+        class="text-center text-muted py-5"
       >
+        <i class="bi bi-inbox display-4 d-block mb-3"></i>
         <span v-if="filter === 'all'">Aucune tâche disponible.</span>
         <span v-else-if="filter === 'active'">Aucune tâche active.</span>
         <span v-else-if="filter === 'done'">Aucune tâche terminée.</span>
@@ -147,14 +149,11 @@ export default {
 <style scoped>
 .task-list-container {
   padding-left: 0;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 /* Transitions pour l'entrée et la sortie */
-.task-transition-enter-active {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
+.task-transition-enter-active,
 .task-transition-leave-active {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -186,8 +185,6 @@ export default {
 
 /* Style pour chaque item */
 .task-transition-item {
-  padding-left: 0;
   margin-bottom: 5px;
-  transition: all 0.5s ease;
 }
 </style>

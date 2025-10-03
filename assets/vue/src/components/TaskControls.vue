@@ -4,7 +4,7 @@
       <!-- Barre de progression -->
       <div class="row mb-2 p-4">
         <div class="col-12">
-          <p class="mb-1 text-center text-dark">
+          <p class="mb-1 text-center fw-bold text-dark">
             <span v-if="tasks.length">
               {{ doneCount }}/{{ tasks.length }} tâche{{
                 doneCount > 1 ? "s" : ""
@@ -57,19 +57,54 @@
 
       <!-- Tri -->
       <div class="row mb-2">
-        <div class="col-12 col-md-2 d-flex align-items-center justify-content-md-center">
-          <label class="form-label  mb-0 text-dark">Tri :</label>
-        </div>
-        <div class="col-12 col-md-10 d-flex align-items-center">
-          <select
-            class="form-select flex-grow-1"
-            v-model="sortValue"
-            @change="emitSort"
-          >
-            <option value="date_asc">Date ↑</option>
-            <option value="date_desc">Date ↓</option>
-            <option value="status">Statut</option>
-          </select>
+        <div class="col-12 d-flex align-items-center">
+          <div class="dropdown flex-grow-1">
+            <button
+              class="btn btn-outline-secondary dropdown-toggle w-100 text-center"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <span v-if="sortValue === 'date_asc'"
+                ><i class="bi bi-calendar"></i> Date ↑</span
+              >
+              <span v-else-if="sortValue === 'date_desc'"
+                ><i class="bi bi-calendar"></i> Date ↓</span
+              >
+              <span v-else-if="sortValue === 'status'"
+                ><i class="bi bi-check-circle"></i> Statut</span
+              >
+            </button>
+            <ul class="dropdown-menu w-100">
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center"
+                  href="#"
+                  @click.prevent="setSort('date_asc')"
+                >
+                  <i class="bi bi-calendar me-2"></i> Date ↑
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center"
+                  href="#"
+                  @click.prevent="setSort('date_desc')"
+                >
+                  <i class="bi bi-calendar me-2"></i> Date ↓
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center"
+                  href="#"
+                  @click.prevent="setSort('status')"
+                >
+                  <i class="bi bi-check-circle me-2"></i> Statut
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -100,6 +135,10 @@ export default {
     },
   },
   methods: {
+    setSort(value) {
+      this.sortValue = value;
+      this.emitSort(); // appel à la fonction que tu avais déjà
+    },
     setFilter(filter) {
       this.currentFilter = filter;
       this.$emit("filter-changed", filter);
@@ -117,13 +156,21 @@ export default {
 
 .custom-progress {
   height: 20px;
-  background-color: #e9ecef; /* gris clair de fond */
+  background-color: #f1f3f5;
   border-radius: 10px;
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .custom-progress .progress-bar {
-  background: linear-gradient(90deg, #a4d5b8, #007e33); /* dégradé vert */
-  transition: width 0.4s ease;
+  background: linear-gradient(90deg, #ffd966, #ffb347);
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+.custom-progress:focus,
+.custom-progress:hover {
+  box-shadow: 0 0 0 0.2rem rgba(255, 176, 71, 0.25);
+  outline: none;
+  transition: box-shadow 0.2s ease;
 }
 </style>

@@ -108,7 +108,10 @@ export default {
         isCompleted: this.task.isCompleted,
       };
       try {
-        const response = await taskService.updateTask(this.task.id, updatedTask);
+        const response = await taskService.updateTask(
+          this.task.id,
+          updatedTask
+        );
         this.isEditingTitle = false;
         this.isEditingDescription = false;
         this.$emit("task-updated", response.data);
@@ -131,7 +134,10 @@ export default {
     async toggleCompletion() {
       const updatedTask = { ...this.task, isCompleted: !this.task.isCompleted };
       try {
-        const response = await taskService.updateTask(this.task.id, updatedTask);
+        const response = await taskService.updateTask(
+          this.task.id,
+          updatedTask
+        );
         this.$emit("task-updated", response.data);
       } catch (error) {
         console.error("Erreur statut :", error);
@@ -147,69 +153,92 @@ export default {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #6c757d;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #d0d5dd;
   border-radius: 50%;
-  outline: none;
   cursor: pointer;
   position: relative;
-  transition: all 0.2s;
+  background: #fff;
+  transition: all 0.25s ease;
 }
+.custom-checkbox:hover {
+  border-color: #7598d4;
+}
+
 /* Quand coché */
 .custom-checkbox:checked {
-  background-color: #28a745;
+  background-color: #b7e4c7;
   border-color: #28a745;
 }
-/* Checkmark */
 .custom-checkbox:checked::after {
   content: "✔";
   color: white;
   font-size: 14px;
+  font-weight: bold;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
 /* Hover pour li non complétés */
+
 li:not(.completed):hover {
-  background-color: #f0f0f0;
-  transition: background-color 0.2s;
+  background: #f9fbff;
+  border-color: #d0e2ff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
 .completed {
-  color: #888;
-  background-color: #b5cfb3;
-  transition: background-color 0.2s;
+  background: #f1f8f5;
+  border-color: #b7e4c7;
+  color: #6b7280;
+  text-decoration: line-through;
+  opacity: 0.9;
 }
 .completed:hover {
-  background-color: #b7e3b4;
+  background: #e0f2e9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
 /* Curseur + hover */
 .editable {
   cursor: text;
-  transition: background-color 0.2s;
-  padding-right: 0.5rem;
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
 }
+
 .editable:hover {
-  background-color: #f8f9fa;
+  background-color: #e0f2ff;
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.15);
 }
+
 /* Icône crayon */
 .edit-icon {
-  font-size: 0.8rem;
-  color: #6c757d;
+  font-size: 0.85rem;
+  color: #007bff;
   opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
+  margin-left: 6px;
+  transition: opacity 0.25s ease;
 }
 .editable:hover .edit-icon {
   opacity: 1;
+}
+.completed .editable:hover {
+  background-color: #bad2c1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 /* Bouton supprimer : masqué par défaut */
 li .btn-delete {
   opacity: 0;
   transform: translateX(5px) scale(0.9);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, color 0.25s ease;
+  color: #ef4444;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
 }
 /* Affichage au survol du li */
 li:hover .btn-delete {
@@ -217,20 +246,28 @@ li:hover .btn-delete {
   transform: translateX(0) scale(1);
   pointer-events: auto;
 }
+li .btn-delete:hover {
+  color: #dc2626;
+  transform: scale(1.25);
+  background: transparent;
+}
+/* Focus / active */
+li .btn-delete:focus,
+li .btn-delete:active {
+  background: transparent;
+}
 
 /* Feedback */
 .text-success {
   transition: opacity 0.3s ease;
 }
+
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+  transition: opacity 0.4s ease;
 }
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-}
-.task-item {
-  transition: all 0.5s ease;
 }
 </style>
