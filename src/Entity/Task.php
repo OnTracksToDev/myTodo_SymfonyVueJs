@@ -17,14 +17,21 @@ class Task
     #[Groups('task')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: "Le titre est obligatoire")]
+    #[Assert\Length(
+        max: 50,
+        maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
+    )]
     #[Groups('task')]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    #[Groups('task')]
-    private ?string $description = null;
+    #[ORM\Column(type: Types::TEXT, length: 150)]
+    #[Assert\Length(
+        max: 150,
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
+    )]
+    #[Groups('task')]    private ?string $description = null;
 
     #[ORM\Column(type: 'boolean')]
     #[Assert\Type(type: 'bool', message: "Le champ isCompleted doit être un booléen")]

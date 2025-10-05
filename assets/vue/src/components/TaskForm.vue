@@ -4,6 +4,7 @@
     <div class="col-12 col-md-8">
       <input
         v-model="taskTitle"
+        maxlength="50"
         type="text"
         class="form-control"
         placeholder="Nouvelle tâche"

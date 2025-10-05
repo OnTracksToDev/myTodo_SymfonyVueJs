@@ -28,6 +28,7 @@
         <input
           v-else
           v-model="editTitle"
+          maxlength="50"
           @blur="saveTask"
           @keyup.enter="saveTask"
           class="form-control form-control-sm"
@@ -51,8 +52,9 @@
         <textarea
           v-else
           v-model="editDescription"
+          maxlength="150"
           @blur="saveTask"
-          @keyup.enter="saveTask"
+          @keydown.ctrl.enter="saveTask"
           rows="2"
           class="form-control form-control-sm"
           placeholder="Saisissez une description..."
@@ -204,6 +206,9 @@ li:not(.completed):hover {
 
 /* Curseur + hover */
 .editable {
+  white-space: pre-wrap; 
+  word-break: break-all;
+  overflow-wrap: anywhere;
   cursor: text;
   padding: 4px 6px;
   border-radius: 8px;
