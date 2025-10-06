@@ -14,11 +14,8 @@
         {% endblock %}
     </head>
     <body class="d-flex flex-column h-100">
-        {% block body %}
             <div id="app">
-                {% block vue_content %}{% endblock %}
             </div>
-        {% endblock %}
 
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
