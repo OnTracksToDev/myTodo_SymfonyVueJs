@@ -37,11 +37,14 @@
       <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div
           v-if="toastMessage"
-          class="toast align-items-center text-bg-warning border-0 show"
+          :class="['toast align-items-center border-0 show', toastClass]"
           role="alert"
         >
           <div class="d-flex">
-            <div class="toast-body">{{ toastMessage }}</div>
+            <div class="toast-body">
+              <i :class="toastIcon" class="me-2"></i>
+              {{ toastMessage }}
+            </div>
           </div>
         </div>
       </div>
@@ -75,6 +78,7 @@ export default {
       filter: "all",
       sort: "date_desc",
       toastMessage: "",
+      toastType: "",
     };
   },
   created() {
@@ -102,6 +106,18 @@ export default {
 
       return filtered;
     },
+    // Classe CSS du toast selon le type
+    toastClass() {
+      const className =
+        this.toastType === "success" ? "text-bg-success" : "text-bg-danger";
+      return className;
+    },
+    // Icône selon le type
+    toastIcon() {
+      return this.toastType === "success"
+        ? "bi bi-check-circle"
+        : "bi bi-trash";
+    },
   },
   methods: {
     async fetchTasks() {
@@ -121,7 +137,7 @@ export default {
     addTaskToList(task) {
       // Nouvelle tâche en haut
       this.tasks.unshift(task);
-      this.showToast(`✅ Tâche "${task.title}" ajoutée !`);
+      this.showToast(`Tâche "${task.title}" ajoutée !`, "success");
     },
     removeTaskFromList(taskId) {
       const index = this.tasks.findIndex((t) => t.id === taskId);
@@ -130,7 +146,7 @@ export default {
         // Attendre la fin de la transition avant de supprimer
         setTimeout(() => {
           this.tasks.splice(index, 1);
-          this.showToast(`🗑️ Tâche "${title}" supprimée`);
+          this.showToast(`Tâche "${title}" supprimée`, "danger");
         }, 400);
       }
     },
@@ -138,9 +154,13 @@ export default {
       const index = this.tasks.findIndex((t) => t.id === updatedTask.id);
       if (index !== -1) this.tasks.splice(index, 1, updatedTask);
     },
-    showToast(msg) {
+    showToast(msg, type = "success") {
       this.toastMessage = msg;
-      setTimeout(() => (this.toastMessage = ""), 2000);
+      this.toastType = type;
+      setTimeout(() => {
+        this.toastMessage = "";
+        this.toastType = "";
+      }, 2000);
     },
   },
 };

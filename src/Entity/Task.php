@@ -26,7 +26,7 @@ class Task
     #[Groups('task')]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT, length: 150)]
+    #[ORM\Column(type: Types::TEXT)]
     #[Assert\Length(
         max: 150,
         maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
