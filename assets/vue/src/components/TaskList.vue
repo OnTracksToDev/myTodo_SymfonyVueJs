@@ -1,9 +1,17 @@
 <template>
   <div class="row justify-content-center mt-4">
     <div class="col-12 col-sm-6">
+      <!-- Date du jour -->
+      <div class="date-container text-center mb-4">
+        <div class="date-badge rounded-pill px-4 py-2 d-inline-block">
+          <i class="bi bi-calendar3 me-2"></i>
+          <span class="fw-semibold">{{ currentDate }}</span>
+        </div>
+      </div>
       <h2 class="app-title text-center">
         <i class="bi bi-list-task me-2"></i> Liste des tâches
       </h2>
+
       <!-- Formulaire pour ajouter une tâche -->
       <TaskForm @task-added="addTaskToList" />
 
@@ -79,10 +87,12 @@ export default {
       sort: "date_desc",
       toastMessage: "",
       toastType: "",
+      currentDate: "",
     };
   },
   created() {
     this.fetchTasks();
+    this.updateDate();
   },
   computed: {
     // Liste filtrée et triée
@@ -162,6 +172,15 @@ export default {
         this.toastType = "";
       }, 2000);
     },
+    updateDate() {
+      const now = new Date();
+      this.currentDate = now.toLocaleDateString("fr-FR", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    },
   },
 };
 </script>
@@ -206,5 +225,31 @@ export default {
 /* Style pour chaque item */
 .task-transition-item {
   margin-bottom: 5px;
+}
+
+/* Date */
+.date-container {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.date-badge {
+  background: linear-gradient(135deg, #ffb347, #ffcc33);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px rgba(255, 179, 71, 0.3);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.date-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 179, 71, 0.4);
+}
+
+.date-badge i {
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 </style>
