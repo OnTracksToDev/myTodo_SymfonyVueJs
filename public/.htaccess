@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    # Désactive MultiViews pour éviter les conflits
+    Options -MultiViews
+
+    # Active le moteur de réécriture
+    RewriteEngine On
+
+    # Ne rien réécrire si le fichier ou le dossier existe
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Sinon, rediriger toutes les requêtes vers index.php
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# Sécurité : empêche l'accès aux fichiers sensibles
+<FilesMatch "(\.env|\.ht|composer\.json|composer\.lock|\.git)">
+    Require all denied
+</FilesMatch>
