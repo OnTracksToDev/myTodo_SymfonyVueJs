@@ -42,11 +42,13 @@
           v-if="!isEditingDescription"
           @dblclick="startEditing('description')"
           :class="[
-            'editable d-inline-flex align-items-center position-relative',
+            'editable d-inline-flex align-items-center position-relative flex-wrap',
             { 'text-muted fst-italic': !task.description },
           ]"
         >
-          {{ task.description || "Pas de description" }}
+          <span class="flex-grow-1">
+            {{ task.description || "Pas de description" }}
+          </span>
           <i class="bi bi-pencil-fill edit-icon ms-1"></i>
         </span>
         <textarea
@@ -206,8 +208,7 @@ li:not(.completed):hover {
 
 /* Curseur + hover */
 .editable {
-  white-space: pre-wrap; 
-  word-break: break-all;
+  white-space: normal;
   overflow-wrap: anywhere;
   cursor: text;
   padding: 4px 6px;
